@@ -13,6 +13,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export interface Booking {
   eventId: Types.ObjectId;
+  slug: string;
   email: string;
   createdAt: Date;
   updatedAt: Date;
@@ -27,6 +28,10 @@ const bookingSchema = new Schema<Booking, BookingModel>(
       type: Schema.Types.ObjectId,
       ref: "Event",
       required: true,
+    },
+    slug: {
+      type: String,
+      required: false,
     },
     email: {
       type: String,
@@ -62,4 +67,5 @@ bookingSchema.pre("save", async function () {
 });
 
 export const Booking =
-  (models.Booking as BookingModel | undefined) ?? model<Booking, BookingModel>("Booking", bookingSchema);
+  (models.Booking as BookingModel | undefined) ??
+  model<Booking, BookingModel>("Booking", bookingSchema);
