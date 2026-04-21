@@ -2,11 +2,9 @@ import BookEvent from "@/components/BookEvent";
 import EventCard from "@/components/EventCard";
 import { getSimilarEventsBySlug } from "@/lib/actions/event.actions";
 import type { Event as EventCardData } from "@/lib/constants";
+import { getEventBySlug } from "@/lib/data/events";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { cacheLife } from "next/cache";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const EventDetailItem = ({
   icon,
@@ -45,29 +43,26 @@ const EvenTags = ({ tags }: { tags: string[] }) => (
 );
 
 const EventDetails = async ({ params }: { params: Promise<string> }) => {
-  "use cache";
-  cacheLife("hours");
   const slug = await params;
 
-  const request = await fetch(`${BASE_URL}/api/events/${slug}`, {
-    next: { revalidate: 60 },
-  });
+  const event = await getEventBySlug(slug);
+
+  if (!event) return notFound();
+
   const {
-    event: {
-      _id: eventId,
-      description,
-      image,
-      overview,
-      date,
-      time,
-      location,
-      mode,
-      agenda,
-      audience,
-      tags,
-      organizer,
-    },
-  } = await request.json();
+    _id: eventId,
+    description,
+    image,
+    overview,
+    date,
+    time,
+    location,
+    mode,
+    agenda,
+    audience,
+    tags,
+    organizer,
+  } = event;
 
   if (!description) return notFound();
 
